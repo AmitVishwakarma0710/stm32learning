@@ -1,0 +1,11 @@
+# Ignore build outputs
+**/Debug/
+**/Release/
+*.o
+*.elf
+*.bin
+*.hex
+*.map
+
+# Ignore IDE specific launch configurations
+*.launch
