@@ -59,8 +59,8 @@ all: main-build
 main-build: try1.elf secondary-outputs
 
 # Tool invocations
-try1.elf try1.map: $(OBJS) $(USER_OBJS) /home/amit/STM32CubeIDE/workspace_2.1.1/try1/STM32F407VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "try1.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/amit/STM32CubeIDE/workspace_2.1.1/try1/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="try1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+try1.elf try1.map: $(OBJS) $(USER_OBJS) /home/amit/Desktop/STMprojects/try1/STM32F407VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "try1.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/amit/Desktop/STMprojects/try1/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="try1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

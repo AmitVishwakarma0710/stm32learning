@@ -22,94 +22,64 @@
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
-// Global Pointer so the ISR can see it
-volatile uint32_t *BSRR = (volatile uint32_t*) 0x40020018;
 
-// The exact function name expected by the ARM vector table
-void SysTick_Handler(void) {
-    // static variables keep their value between function calls!
-    static uint32_t ms_tick_count = 0;
-    static uint8_t led_is_on = 0;
 
-    ms_tick_count++; // This increases by 1 every millisecond
 
-    if (ms_tick_count >= 500) { // Half a second has passed!
-        ms_tick_count = 0;      // Reset the counter
 
-        // Toggle the LED using our atomic BSRR logic
-        if (led_is_on) {
-            *BSRR = (1 << 6);   // Turn OFF (Drive HIGH)
-            led_is_on = 0;
-        } else {
-            *BSRR = (1 << 22);  // Turn ON (Drive LOW)
-            led_is_on = 1;
-        }
-    }
-}
 
 int main(void)
 {
-	/*first on power on pa6 pin Power for this microcontroller is RCC (Reset and clock control)
-	 * to powerON on pa6 ww have to on ABH1 bus which connect power to pa6
-	 * RCC address satrt at 0x40023800 and AHB1_ENR start at 0x30 hence address is 0x40023830
-	 */
-	volatile uint32_t *RCC =(volatile uint32_t*)0x40023830;
-	*RCC |= (1<<0);
 
-	/* Second we have set gpio multiplexer pin6 to output
-	 * for m
-	 */
+	volatile uint32_t *RCC_AHB1ENR =(volatile uint32_t*)0x40023830;
+	*RCC_AHB1ENR |= (1<<0);
+
+	volatile uint32_t *RCC_APB1ENR =(volatile uint32_t*)0x40023840;
+	*RCC_APB1ENR |= (1<<1);
+
+
+
+
 	volatile uint32_t *GPIO_MODDER = (volatile uint32_t*)0x40020000;
-	*GPIO_MODDER |=(1<<12);
+	*GPIO_MODDER &= ~(3<<12);
+	*GPIO_MODDER |=  (2<<12);
 
-	//	PA6 - LED PIN ITS ADDRESS 0X40020000 WITH OFSET 0x14 hence 0x40020014
+	volatile uint32_t *GPIOA_AFRL = (volatile uint32_t*)0x40020020;
+	*GPIOA_AFRL &= ~(15<<24);
+	*GPIOA_AFRL |=  (2<<24);
 
-	volatile uint32_t *GPIOA6 = (volatile uint32_t*) 0x40020014;
+	volatile uint32_t *TIM3_PSC = (volatile uint32_t*)0x40000428;
+	*TIM3_PSC = 15;
 
-//    *BSRR = (1<<6);
+	volatile uint32_t *TIM3_ARR = (volatile uint32_t*)0x4000042C;
+	*TIM3_ARR = 999;
 
-//	Data extention and monitor control register - this is the register where DWT and TMT is there and it enables it in 24th bit
-	volatile uint32_t *DEMCR = (volatile uint32_t*)0xE000EDFC;
-//	*DEMCR |= (1<<24);
+	volatile uint32_t *TIM3_CCR1 = (volatile uint32_t*)0x40000434;
+	*TIM3_CCR1 = 990;
 
-	//DEMCR control (cntrl) -
-	volatile uint32_t *DWT_CNTRL = (volatile uint32_t*)0xE0001000;
-//	*DWT_CNTRL |= (1<<0);
+	volatile uint32_t *TIM3_CCMR1 = (volatile uint32_t*)0x40000418;
+	*TIM3_CCMR1 |= (6 << 4);
 
-	volatile uint32_t *DWT_CYCCNT =(volatile uint32_t*)0xE0001004;
-//	*DWT_CYCCNT =1;
+	volatile uint32_t *TIM3_CCER = (volatile uint32_t*)0x40000420;
+	*TIM3_CCER |= (1 << 0);
 
-	volatile uint32_t start_time ;
-	volatile uint32_t END_time ;
-	volatile uint32_t total_cycles ;
+	volatile uint32_t *TIM3_CR1 = (volatile uint32_t*)0x40000400;
+	*TIM3_CR1 |= (1 << 0);
 
-	*DEMCR |= (1<<24);
-	*DWT_CYCCNT =0;
-	*DWT_CNTRL |= (1<<0);
-	/* Loop forever */
-	volatile uint32_t *systic_CSR = (volatile uint32_t *)0xE000E010;
 
-	volatile uint32_t *systic_RVR = (volatile uint32_t *)0xE000E014;
-	volatile uint32_t *systic_CVR = (volatile uint32_t *)0xE000E018;
 
-	*systic_CVR = 0;
-	*systic_RVR = 15999;
-	*systic_CSR |= (7<<0);
 	for(;;){
+		for( uint32_t i =1000; i>0; i--){
+			*TIM3_CCR1 = i;
 
+			for(volatile uint32_t delay = 0; delay < 2000; delay++) {}
+		}
 
+		for( uint32_t i=0; i<1000; i++){
+			*TIM3_CCR1 =i;
 
-//	    *BSRR = (1<<22);
-//	    start_time = *DWT_CYCCNT;
-//		for(volatile uint32_t i=0; i<400000;i++){}
-//		END_time =*DWT_CYCCNT;
-//
-//		total_cycles = END_time - start_time;
-//
-//	    *BSRR = (1<<6);
-//	    for(volatile uint32_t i=0;i<400000; i++){}
+			for(volatile uint32_t delay=0; delay <2000; delay++){}
 
-
+		}
 
 	}
 }
