@@ -51,10 +51,10 @@ int main(void)
 	*TIM3_PSC = 15;
 
 	volatile uint32_t *TIM3_ARR = (volatile uint32_t*)0x4000042C;
-	*TIM3_ARR = 999;
+	*TIM3_ARR = 9999;
 
 	volatile uint32_t *TIM3_CCR1 = (volatile uint32_t*)0x40000434;
-	*TIM3_CCR1 = 990;
+//	*TIM3_CCR1 = 990;
 
 	volatile uint32_t *TIM3_CCMR1 = (volatile uint32_t*)0x40000418;
 	*TIM3_CCMR1 |= (6 << 4);
@@ -65,19 +65,28 @@ int main(void)
 	volatile uint32_t *TIM3_CR1 = (volatile uint32_t*)0x40000400;
 	*TIM3_CR1 |= (1 << 0);
 
+//	volatile uint32_t *systic_CSR = (volatile uint32_t *)0xE000E010;
+//
+//	volatile uint32_t *systic_RVR = (volatile uint32_t *)0xE000E014;
+//	volatile uint32_t *systic_CVR = (volatile uint32_t *)0xE000E018;
+//
+//	*systic_CVR = 0;
+//	*systic_RVR = 15999;
+//	*systic_CSR |= (7<<0);
+
 
 
 	for(;;){
-		for( uint32_t i =1000; i>0; i--){
+		for( uint32_t i =10000; i>0; i--){
 			*TIM3_CCR1 = i;
 
-			for(volatile uint32_t delay = 0; delay < 2000; delay++) {}
+			for(volatile uint32_t delay = 0; delay < 20000; delay++) {}
 		}
 
-		for( uint32_t i=0; i<1000; i++){
+		for( uint32_t i=0; i<10000; i++){
 			*TIM3_CCR1 =i;
 
-			for(volatile uint32_t delay=0; delay <2000; delay++){}
+			for(volatile uint32_t delay=0; delay <20000; delay++){}
 
 		}
 
