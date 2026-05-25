@@ -23,14 +23,24 @@
 #endif
 
 
-
 volatile uint32_t *GPIOA_ODR = (volatile uint32_t*)0x40020014;
 
 volatile uint32_t *EXTI4_PR = (volatile uint32_t*)0x40013C14;
 
-void EXTI4_IRQHandler(void){
-	*GPIOA_ODR ^= (1<<6);
 
+volatile uint32_t SYStic_count =0;
+
+void SysTick_Handler(void){
+	SYStic_count++;
+}
+
+void EXTI4_IRQHandler(void){
+
+	static uint32_t last_time =0;
+	if(SYStic_count-last_time>50){
+		*GPIOA_ODR ^= (1<<6);
+		last_time = SYStic_count;
+	}
 	*EXTI4_PR= (1<<4) ;
 }
 
@@ -78,8 +88,18 @@ int main(void)
 	*GPIOA_MODDER &= ~(3<<12);
 	*GPIOA_MODDER |=  (1<<12);
 
-
 	*GPIOA_ODR |= (1<<6);
+
+	volatile uint32_t *systic_CSR = (volatile uint32_t *)0xE000E010;
+
+	volatile uint32_t *systic_RVR = (volatile uint32_t *)0xE000E014;
+	volatile uint32_t *systic_CVR = (volatile uint32_t *)0xE000E018;
+
+	*systic_CVR = 0;
+	*systic_RVR = 15999;
+	*systic_CSR |= (7<<0);
+
+
 
 	for(;;){
 
