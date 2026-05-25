@@ -24,6 +24,16 @@
 
 
 
+volatile uint32_t *GPIOA_ODR = (volatile uint32_t*)0x40020014;
+
+volatile uint32_t *EXTI4_PR = (volatile uint32_t*)0x40013C14;
+
+void EXTI4_IRQHandler(void){
+	*GPIOA_ODR ^= (1<<6);
+
+	*EXTI4_PR= (1<<4) ;
+}
+
 
 
 
@@ -31,64 +41,47 @@ int main(void)
 {
 
 	volatile uint32_t *RCC_AHB1ENR =(volatile uint32_t*)0x40023830;
-	*RCC_AHB1ENR |= (1<<0);
+	*RCC_AHB1ENR &= ~(17<<0);
+	*RCC_AHB1ENR |= (17<<0);
 
 	volatile uint32_t *RCC_APB1ENR =(volatile uint32_t*)0x40023840;
 	*RCC_APB1ENR |= (1<<1);
 
+	volatile uint32_t *RCC_APB2ENR =(volatile uint32_t*)0x40023844;
+	*RCC_APB2ENR |= (1<<14);
 
 
+	volatile uint32_t *GPIOE_MODDER = (volatile uint32_t*)0x40021000;
+	*GPIOE_MODDER &= ~(3<<8);
 
-	volatile uint32_t *GPIO_MODDER = (volatile uint32_t*)0x40020000;
-	*GPIO_MODDER &= ~(3<<12);
-	*GPIO_MODDER |=  (2<<12);
+	volatile uint32_t *GPIOE_PUPDR = (volatile uint32_t*)0x4002100C;
+	*GPIOE_PUPDR &= ~(3<<8);
+	*GPIOE_PUPDR |= (1<<8);
 
-	volatile uint32_t *GPIOA_AFRL = (volatile uint32_t*)0x40020020;
-	*GPIOA_AFRL &= ~(15<<24);
-	*GPIOA_AFRL |=  (2<<24);
+	volatile uint32_t *SYSCFG_EXTICR2 = (volatile uint32_t*)0x4001380C;
+	*SYSCFG_EXTICR2 &= ~(4<<0);
+	*SYSCFG_EXTICR2 |= (4<<0);
 
-	volatile uint32_t *TIM3_PSC = (volatile uint32_t*)0x40000428;
-	*TIM3_PSC = 15;
+	volatile uint32_t *EXTI4_IMR = (volatile uint32_t*)0x40013C00;
+	*EXTI4_IMR |= (1<<4);
 
-	volatile uint32_t *TIM3_ARR = (volatile uint32_t*)0x4000042C;
-	*TIM3_ARR = 9999;
+	volatile uint32_t *EXTI4_FTSR = (volatile uint32_t*)0x40013C0C;
+	*EXTI4_FTSR |= (1<<4);
 
-	volatile uint32_t *TIM3_CCR1 = (volatile uint32_t*)0x40000434;
-//	*TIM3_CCR1 = 990;
+	volatile uint32_t *EXTI4_RTSR = (volatile uint32_t*)0x40013C08;
+	*EXTI4_RTSR &= ~(1<<4);
 
-	volatile uint32_t *TIM3_CCMR1 = (volatile uint32_t*)0x40000418;
-	*TIM3_CCMR1 |= (6 << 4);
+	volatile uint32_t *NVIC_ISER0 = (volatile uint32_t*)0xE000E100;
+	*NVIC_ISER0 |= (1<<10);
 
-	volatile uint32_t *TIM3_CCER = (volatile uint32_t*)0x40000420;
-	*TIM3_CCER |= (1 << 0);
-
-	volatile uint32_t *TIM3_CR1 = (volatile uint32_t*)0x40000400;
-	*TIM3_CR1 |= (1 << 0);
-
-//	volatile uint32_t *systic_CSR = (volatile uint32_t *)0xE000E010;
-//
-//	volatile uint32_t *systic_RVR = (volatile uint32_t *)0xE000E014;
-//	volatile uint32_t *systic_CVR = (volatile uint32_t *)0xE000E018;
-//
-//	*systic_CVR = 0;
-//	*systic_RVR = 15999;
-//	*systic_CSR |= (7<<0);
+	volatile uint32_t *GPIOA_MODDER = (volatile uint32_t*)0x40020000;
+	*GPIOA_MODDER &= ~(3<<12);
+	*GPIOA_MODDER |=  (1<<12);
 
 
+	*GPIOA_ODR |= (1<<6);
 
 	for(;;){
-		for( uint32_t i =10000; i>0; i--){
-			*TIM3_CCR1 = i;
-
-			for(volatile uint32_t delay = 0; delay < 20000; delay++) {}
-		}
-
-		for( uint32_t i=0; i<10000; i++){
-			*TIM3_CCR1 =i;
-
-			for(volatile uint32_t delay=0; delay <20000; delay++){}
-
-		}
 
 	}
 }
